@@ -20,8 +20,12 @@ byte addr[8];
 boolean light = 0; // lights off by default.
 OneWire ds(pin_number); // Select pin wher DS18B22 is connected.
 
-
-// Function to get temperature.
+//--------------------------------
+//  Function to get temperature.
+//--------------------------------
+// This gets the tempreature from
+// the DS18B20 Connected to pin 2
+//--------------------------------
 boolean getTemp(){
  
  //If device not found on addr.
@@ -59,7 +63,14 @@ boolean getTemp(){
  return true;
 }
 
-// Control Lights ON/OFF.
+//------------------------------------
+//     Control Lights ON/OFF.
+//------------------------------------
+//This function will control the lights.
+//it will serve as the way for the timer
+//to turn the lights on and off at a 
+//specific time of the day.
+//------------------------------------
 void lights() {
   if (light == 0) {
     // Turn on light.
@@ -74,6 +85,14 @@ void setup() {
 }
 
 void loop() {
+  //-----------------------------
+  //  Get command from serial.
+  //-----------------------------
+  // This will handle input from
+  // the serial connection, and
+  // run the functions requested
+  // by the user/control unite.
+  //-----------------------------
   if (Serial.available()) { // read from serial.
     intRead = Serial.read(); // Read the most recent int.    
     
