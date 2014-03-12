@@ -19,8 +19,8 @@ int pin_number = 2;
 float temp; // Temprature of the water.
 byte i;
 byte present = 0;
-byte data[12];
-byte addr[8];
+byte data[12]; // This will hold the data returned by sensor.
+byte addr[8]; // This will hold the address of the sensor.
 boolean light = 0; // lights off by default.
 OneWire ds(pin_number); // Select pin wher DS18B22 is connected.
 
@@ -38,7 +38,7 @@ boolean getTemp(){
   // If device not found on addr return false.
   if (!ds.search(addr)) {
     ds.reset_search(); // Clear search state.
-    return false;
+    //return false;
   }
   
   if (OneWire::crc8( addr, 7) != addr[7]) {
@@ -58,16 +58,14 @@ boolean getTemp(){
   present = ds.reset(); // Check if DS18B22 is present.
   ds.select(addr); // Select rom command addr 8.
   
-  // Issue Read scratchpad command
-  ds.write(0xBE);
+  ds.write(0xBE); // Issue Read scratchpad command
    
   // Receive 9 bytes
   for ( i = 0; i < 9; i++) {
     data[i] = ds.read();
   }
   
-  // Calculate temperature value
-  temp = ( (data[1] << 8) + data[0] )*0.0625;
+  temp = ( (data[1] << 8) + data[0] )*0.0625; // Calculate temperature value
   return true;
 }
 
@@ -82,14 +80,14 @@ boolean getTemp(){
 void lights() {
   if (light == 0) {
     digitalWrite(RELAY1,HIGH); // Turn on light 1.
-    delay(1500); // Wait for a while.
+    delay(2500); // Wait for a while.
     digitalWrite(RELAY2,HIGH); // Turn on light 2.
     light = 1; // Set light variable to on.
     digitalWrite(LED,HIGH); // Turn on LED to indicate lights on.
   }
   else if (light == 1) {
     digitalWrite(RELAY2,LOW); // Turn off light 2.
-    delay(1500); // Wait for a while.
+    delay(3000); // Wait for a while before turning on 2nd light.
     digitalWrite(RELAY1,LOW); // Turn off light 1.
     light = 0; // Set light variable to off.
     digitalWrite(LED,LOW); // Turn off LED to indicate lights off.
