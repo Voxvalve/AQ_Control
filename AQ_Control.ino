@@ -9,7 +9,9 @@
 */
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
-#define NumberOfDevices 1
+#define RELAY1 6
+#define RELAY2 7
+#define LED 13
 #include <OneWire.h>
 
 int intRead; // int to identify command chosen.
@@ -79,16 +81,18 @@ boolean getTemp(){
 //------------------------------------
 void lights() {
   if (light == 0) {
-    // Turn on light 1.
+    digitalWrite(RELAY1,HIGH); // Turn on light 1.
     delay(1500); // Wait for a while.
-    // Turn on light 2.
+    digitalWrite(RELAY2,HIGH); // Turn on light 2.
     light = 1; // Set light variable to on.
+    digitalWrite(LED,HIGH); // Turn on LED to indicate lights on.
   }
   else if (light == 1) {
-    // Turn off light 1.
+    digitalWrite(RELAY2,LOW); // Turn off light 2.
     delay(1500); // Wait for a while.
-    // Turn off light 2.
+    digitalWrite(RELAY1,LOW); // Turn off light 1.
     light = 0; // Set light variable to off.
+    digitalWrite(LED,LOW); // Turn off LED to indicate lights off.
   }
 }
 
@@ -115,6 +119,12 @@ void getAddr() {
 
 //-------- SETUP START --------//
 void setup() {
+  pinMode(RELAY1, OUTPUT); // Set RELAY1(pin 6) to output.
+  pinMode(RELAY2, OUTPUT); // Set RELAY2(pin 7) to output.
+  pinMode(LED, OUTPUT); // Set onboard led to output.
+  digitalWrite(RELAY1,LOW); // Turn off light 1 by default.
+  digitalWrite(RELAY2,LOW); // Turn off light 2 by default.
+  digitalWrite(LED,LOW); // turn off onboard led to indicate lights off.
   Serial.begin(9600); // Enable serial communication.
 }
 //--------- SETUP END ---------//
