@@ -13,6 +13,7 @@
 #define RELAY2 7
 #define LED 13
 #include <OneWire.h>
+#include <LiquidCrystal.h>
 
 int intRead; // int to identify command chosen.
 int pin_number = 2;
@@ -23,6 +24,7 @@ byte data[12]; // This will hold the data returned by sensor.
 byte addr[8]; // This will hold the address of the sensor.
 boolean light = 0; // lights off by default.
 OneWire ds(pin_number); // Select pin wher DS18B22 is connected.
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7); // initialize the library with the numbers of the interface pins.
 
 //----------------------------------
 //    Function to get temperature.
@@ -64,12 +66,8 @@ boolean getTemp(){
   for ( i = 0; i < 9; i++) {
     data[i] = ds.read();
   }
-  
-  Serial.println(); 
-  Serial.println(data[1]);
-  Serial.println(data[0]);
-  Serial.println(data[1] << 8);  
-  temp = ( (data[1] << 8) + data[0] )*0.0625; // Calculate temperature value
+   
+  temp = ( (data[1] << 8) + data[0] )*0.0625; // Calculate temperature value  
   return true;
 }
 
@@ -128,6 +126,8 @@ void setup() {
   digitalWrite(RELAY2,LOW); // Turn off light 2 by default.
   digitalWrite(LED,LOW); // turn off onboard led to indicate lights off.
   Serial.begin(9600); // Enable serial communication.
+  lcd.begin(16, 2); // LCD colums, rows.
+  lcd.print("AQ-Control");
 }
 //--------- SETUP END ---------//
 
@@ -150,7 +150,7 @@ void loop() {
       getTemp(); // Run function to get temprature.
       delay(5); // Pause for stability.
       Serial.print(temp); // Print temprature to serial.
-      Serial.println("C");
+      Serial.println("C"); // Put a C on it!.
     }
     else if (intRead == '2') // Command "2" from the command list.
     { 
@@ -163,6 +163,12 @@ void loop() {
       delay(5); // Pause for stability.
     }
   }
+  delay(1000); // wait for stability.
+  getTemp(); // Run function to get temprature.
+  lcd.setCursor(0, 1); // Set LCD cursor to charater 0 on 2nd. line.
+  lcd.print(temp); // Write temp to LCD.
+  lcd.setCursor(5, 1); // Set LCD cursor to charater 5 on 2nd line.
+  lcd.print("C"); // Put a C on it LCD edition.
 }
 //--------- LOOP END ---------//
 
