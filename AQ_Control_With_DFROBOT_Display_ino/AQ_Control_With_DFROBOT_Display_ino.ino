@@ -9,9 +9,9 @@
 */
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
-#define RELAY1 6
-#define RELAY2 7
-#define LED 13
+#define RELAY1 11
+#define RELAY2 12
+#define RELAY3 13
 #include <OneWire.h>
 #include <LiquidCrystal.h>
 
@@ -82,17 +82,19 @@ boolean getTemp(){
 void lights() {
   if (light == 0) {
     digitalWrite(RELAY1,HIGH); // Turn on light 1.
-    delay(2500); // Wait for a while.
+    delay(3000); // Wait for a while.
     digitalWrite(RELAY2,HIGH); // Turn on light 2.
+    delay(3000); // Wait for a while.
+    digitalWrite(RELAY3,HIGH); // Turn on light 2.
     light = 1; // Set light variable to on.
-    digitalWrite(LED,HIGH); // Turn on LED to indicate lights on.
   }
   else if (light == 1) {
-    digitalWrite(RELAY2,LOW); // Turn off light 2.
+    digitalWrite(RELAY3,LOW); // Turn off light 2.
+    delay(3000); // Wait for a while before turning on 2nd light.
+    digitalWrite(RELAY2,LOW); // Turn off light 1
     delay(3000); // Wait for a while before turning on 2nd light.
     digitalWrite(RELAY1,LOW); // Turn off light 1.
     light = 0; // Set light variable to off.
-    digitalWrite(LED,LOW); // Turn off LED to indicate lights off.
   }
 }
 
@@ -119,15 +121,14 @@ void getAddr() {
 
 //-------- SETUP START --------//
 void setup() {
-  pinMode(RELAY1, OUTPUT); // Set RELAY1(pin 6) to output.
-  pinMode(RELAY2, OUTPUT); // Set RELAY2(pin 7) to output.
-  pinMode(LED, OUTPUT); // Set onboard led to output.
+  pinMode(RELAY1, OUTPUT); // Set RELAY1(pin 11) to output.
+  pinMode(RELAY2, OUTPUT); // Set RELAY2(pin 12) to output.
+  pinMode(RELAY3, OUTPUT); // Set RELAY3(pin 13) to output.
   digitalWrite(RELAY1,LOW); // Turn off light 1 by default.
   digitalWrite(RELAY2,LOW); // Turn off light 2 by default.
-  digitalWrite(LED,LOW); // turn off onboard led to indicate lights off.
+  digitalWrite(RELAY3,LOW); // Turn off light 3 by default.
   Serial.begin(9600); // Enable serial communication.
   lcd.begin(16, 2); // LCD colums, rows.
-  lcd.print("AQ-Control");
 }
 //--------- SETUP END ---------//
 
@@ -169,6 +170,19 @@ void loop() {
   lcd.print(temp); // Write temp to LCD.
   lcd.setCursor(5, 1); // Set LCD cursor to charater 5 on 2nd line.
   lcd.print("C"); // Put a C on it LCD edition.
+  
+  if (temp < 24.00) {
+    lcd.setCursor(0, 0);
+    lcd.print("WARNING TEMP L  "); // Write text on screen.
+  }
+  else if (temp > 27.70) {
+    lcd.setCursor(0, 0);
+    lcd.print("WARNING TEMP H  "); // Write text on screen.
+  }
+  else {
+    lcd.setCursor(0, 0);
+    lcd.print("AQ-Control      "); // Write text on screen.
+  }
 }
 //--------- LOOP END ---------//
 
