@@ -173,11 +173,11 @@ void loop() {
   
   if (temp < 24.00) {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
-    lcd.print("WARNING TEMP L  ");              // Warning for low temprature.
+    lcd.print("WARNING TEMP LO ");              // Warning for low temprature.
   }
   else if (temp > 27.70) {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
-    lcd.print("WARNING TEMP H  ");              // Warning for high temprature.
+    lcd.print("WARNING TEMP HI ");              // Warning for high temprature.
   }
   else {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
