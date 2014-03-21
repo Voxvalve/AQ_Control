@@ -9,28 +9,29 @@
 */
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
-#define RELAY1 11
-#define RELAY2 12
-#define RELAY3 13
+#define RELAY1 15
+#define RELAY2 16
+#define RELAY3 17
+#define RELAY4 18
 #include <OneWire.h>
 #include <LiquidCrystal.h>
 
 int intRead;                                    // int to identify command chosen.
-int pin_number = 2;
+int sensor = 14;
+int light = 0;                                  // lights off by default.
 float temp;                                     // Temprature of the water.
 byte i;
 byte present = 0;
 byte data[12];                                  // This will hold the data returned by sensor.
 byte addr[8];                                   // This will hold the address of the sensor.
-boolean light = 0;                              // lights off by default.
-OneWire ds(pin_number);                         // Select pin wher DS18B22 is connected.
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7);            // initialize the library with the numbers of the interface pins.
+OneWire ds(sensor);                             // Select pin wher DS18B22 is connected.
+LiquidCrystal lcd(6, 7, 2, 3, 4, 5);            // initialize the library with the numbers of the interface pins.
 
 //----------------------------------
 //    Function to get temperature.
 //----------------------------------
 // This gets the tempreature from
-// the DS18B20 Connected to pin 2
+// the DS18B20's Connected to pin 14
 // and converts it to degrees celsius.
 //----------------------------------
 boolean getTemp(){
@@ -85,13 +86,17 @@ void lights() {
     delay(3000);                                // Wait for a while.
     digitalWrite(RELAY2,HIGH);                  // Turn on light 2.
     delay(3000);                                // Wait for a while.
-    digitalWrite(RELAY3,HIGH);                  // Turn on light 2.
+    digitalWrite(RELAY3,HIGH);                  // Turn on light 3.
+    delay(3000);                                // Wait for a while.
+    digitalWrite(RELAY4,HIGH);                  // Turn on light 4.
     light = 1;                                  // Set light variable to on.
   }
   else if (light == 1) {
-    digitalWrite(RELAY3,LOW);                   // Turn off light 2.
+    digitalWrite(RELAY4,LOW);                   // Turn off light 4.
+    delay(3000);
+    digitalWrite(RELAY3,LOW);                   // Turn off light 3.
     delay(3000);                                // Wait for a while before turning on 2nd light.
-    digitalWrite(RELAY2,LOW);                   // Turn off light 1
+    digitalWrite(RELAY2,LOW);                   // Turn off light 2
     delay(3000);                                // Wait for a while before turning on 2nd light.
     digitalWrite(RELAY1,LOW);                   // Turn off light 1.
     light = 0;                                  // Set light variable to off.
@@ -121,12 +126,14 @@ void getAddr() {
 
 //-------- SETUP START --------//
 void setup() {
-  pinMode(RELAY1, OUTPUT);                      // Set RELAY1(pin 11) to output.
-  pinMode(RELAY2, OUTPUT);                      // Set RELAY2(pin 12) to output.
-  pinMode(RELAY3, OUTPUT);                      // Set RELAY3(pin 13) to output.
+  pinMode(RELAY1, OUTPUT);                      // Set RELAY1(pin 14) to output.
+  pinMode(RELAY2, OUTPUT);                      // Set RELAY2(pin 15) to output.
+  pinMode(RELAY3, OUTPUT);                      // Set RELAY3(pin 16) to output.
+  pinMode(RELAY4, OUTPUT);                      // Set RELAY3(pin 17) to output.
   digitalWrite(RELAY1,LOW);                     // Turn off light 1 by default.
   digitalWrite(RELAY2,LOW);                     // Turn off light 2 by default.
   digitalWrite(RELAY3,LOW);                     // Turn off light 3 by default.
+  digitalWrite(RELAY4,LOW);                     // Turn off light 4 by default.
   Serial.begin(9600);                           // Enable serial communication.
   lcd.begin(16, 2);                             // LCD colums, rows.
 }
