@@ -3,6 +3,7 @@
   -----------------------
   1.) Get temprature.
   2.) Turn on light.
+  3.) Turn off light.
   -----------------------
   0.) Get sensor address.
   -----------------------
@@ -18,7 +19,6 @@
 
 int intRead;                                    // int to identify command chosen.
 int sensor = 14;
-int light = 0;                                  // lights off by default.
 float temp;                                     // Temprature of the water.
 byte i;
 byte present = 0;
@@ -80,27 +80,23 @@ boolean getTemp(){
 //to turn the lights on and off at a 
 //specific time of the day.
 //------------------------------------
-void lights() {
-  if (light == 0) {
-    digitalWrite(RELAY1,HIGH);                  // Turn on light 1.
-    delay(3000);                                // Wait for a while.
-    digitalWrite(RELAY2,HIGH);                  // Turn on light 2.
-    delay(3000);                                // Wait for a while.
-    digitalWrite(RELAY3,HIGH);                  // Turn on light 3.
-    delay(3000);                                // Wait for a while.
-    digitalWrite(RELAY4,HIGH);                  // Turn on light 4.
-    light = 1;                                  // Set light variable to on.
-  }
-  else if (light == 1) {
-    digitalWrite(RELAY4,LOW);                   // Turn off light 4.
-    delay(3000);
-    digitalWrite(RELAY3,LOW);                   // Turn off light 3.
-    delay(3000);                                // Wait for a while before turning on 2nd light.
-    digitalWrite(RELAY2,LOW);                   // Turn off light 2
-    delay(3000);                                // Wait for a while before turning on 2nd light.
-    digitalWrite(RELAY1,LOW);                   // Turn off light 1.
-    light = 0;                                  // Set light variable to off.
-  }
+void lightsOn() {
+  digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
+  delay(3000);                                  // Wait for a while.
+  digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
+  delay(3000);                                  // Wait for a while.
+  digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
+  delay(3000);                                  // Wait for a while.
+  digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
+}
+void lightsOff() {
+  digitalWrite(RELAY4,LOW);                     // Turn off light 4.
+  delay(3000);                                  // Wait for a while.
+  digitalWrite(RELAY3,LOW);                     // Turn off light 3.
+  delay(3000);                                  // Wait for a while.
+  digitalWrite(RELAY2,LOW);                     // Turn off light 2
+  delay(3000);                                  // Wait for a while.
+  digitalWrite(RELAY1,LOW);                     // Turn off light 1.
 }
 
 //------------------------------------
@@ -162,7 +158,12 @@ void loop() {
     }
     else if (intRead == '2')                    // Command "2" from the command list.
     { 
-      lights();                                 // Run function to control lights.
+      lightsOn();                               // Run function to turn on lights.
+      delay(5);                                 // Pause for stability.
+    }
+    else if (intRead == '3')                    // Command "2" from the command list.
+    { 
+      lightsOff();                              // Run function to turn off lights.
       delay(5);                                 // Pause for stability.
     }
     else if (intRead == '0')                    // Command "2" from the command list.
