@@ -25,7 +25,7 @@ byte present = 0;
 byte data[12];                                  // This will hold the data returned by sensor.
 byte addr[8];                                   // This will hold the address of the sensor.
 OneWire ds(sensor);                             // Select pin wher DS18B22 is connected.
-LiquidCrystal lcd(6, 7, 2, 3, 4, 5);            // initialize the library with the numbers of the interface pins.
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // initialize the library with the numbers of the interface pins.
 
 //----------------------------------
 //    Function to get temperature.
