@@ -10,16 +10,27 @@
 */
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
-#define RELAY1 15
-#define RELAY2 16
-#define RELAY3 17
-#define RELAY4 18
+#define DS1307_ADDRESS 0x68
+#define sensor 14
+#define RELAY1 8
+#define RELAY2 9
+#define RELAY3 10
+#define RELAY4 11
+#include <Wire.h>
 #include <OneWire.h>
 #include <LiquidCrystal.h>
 
 int intRead;                                    // int to identify command chosen.
-int sensor = 14;
+//int sensor = 14;                                
+int second;                                     // This will hold the second of the time
+int minute;                                     // This will hold the minute of the time
+int hour;                                       // This will hold the hour of the time
+int weekDay;                                    // This will hold the day of the week of the time
+int monthDay;                                   // This will hold the day of the mounth of the time
+int month;                                      // This will hold the month of the time
+int year;                                       // This will hold the year of the time
 float temp;                                     // Temprature of the water.
+byte zero = 0x00;                               //workaround for issue #527
 byte i;
 byte present = 0;
 byte data[12];                                  // This will hold the data returned by sensor.
@@ -27,13 +38,56 @@ byte addr[8];                                   // This will hold the address of
 OneWire ds(sensor);                             // Select pin wher DS18B22 is connected.
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // initialize the library with the numbers of the interface pins.
 
-//----------------------------------
+//-----------------------------------
+//     Function to convert time.
+//-----------------------------------
+// Convert binary coded decimal 
+// to normal decimal numbers.
+//-----------------------------------
+byte bcdToDec(byte val)  {
+
+  return ( (val/16*10) + (val%16) );
+}
+
+//-----------------------------------
+//      Function to get time.
+//-----------------------------------
+// This gets the time from the DS1307
+//-----------------------------------
+void printDate(){
+
+  // Reset the register pointer
+  Wire.beginTransmission(DS1307_ADDRESS);
+  Wire.write(zero);
+  Wire.endTransmission();
+
+  Wire.requestFrom(DS1307_ADDRESS, 7);
+
+  second = bcdToDec(Wire.read());
+  minute = bcdToDec(Wire.read());
+  hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
+  weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
+  monthDay = bcdToDec(Wire.read());
+  month = bcdToDec(Wire.read());
+  year = bcdToDec(Wire.read());
+
+  //print the date EG 23:59:59
+
+  Serial.print(hour);
+  Serial.print(":");
+  Serial.print(minute);
+  Serial.print(":");
+  Serial.println(second);
+
+}
+
+//-----------------------------------
 //    Function to get temperature.
-//----------------------------------
+//-----------------------------------
 // This gets the tempreature from
 // the DS18B20's Connected to pin 14
 // and converts it to degrees celsius.
-//----------------------------------
+//-----------------------------------
 boolean getTemp(){
  
   temp = 00.00;                                 // Debug purpose.
@@ -72,15 +126,15 @@ boolean getTemp(){
   return true;
 }
 
-//------------------------------------
+//-------------------------------------
 //     Control Lights ON/OFF.
-//------------------------------------
+//-------------------------------------
 //This function will control the lights.
 //it will serve as the way for the timer
 //to turn the lights on and off at a 
 //specific time of the day.
-//------------------------------------
-void lightsOn() {
+//-------------------------------------
+void lightsOff() {
   digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
   delay(3000);                                  // Wait for a while.
   digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
@@ -89,7 +143,7 @@ void lightsOn() {
   delay(3000);                                  // Wait for a while.
   digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
 }
-void lightsOff() {
+void lightsOn() {
   digitalWrite(RELAY4,LOW);                     // Turn off light 4.
   delay(3000);                                  // Wait for a while.
   digitalWrite(RELAY3,LOW);                     // Turn off light 3.
@@ -99,13 +153,13 @@ void lightsOff() {
   digitalWrite(RELAY1,LOW);                     // Turn off light 1.
 }
 
-//------------------------------------
+//-------------------------------------
 //       Get sensor address.
-//------------------------------------
+//-------------------------------------
 //This function will assemble the
 //address of the sensor and print in
 //hexidecimal.
-//------------------------------------
+//-------------------------------------
 void getAddr() {
   for( i=0; i < 8; i++) {
       Serial.print("0x");
@@ -132,6 +186,7 @@ void setup() {
   digitalWrite(RELAY4,LOW);                     // Turn off light 4 by default.
   Serial.begin(9600);                           // Enable serial communication.
   lcd.begin(16, 2);                             // LCD colums, rows.
+  Wire.begin();                                 // Start the connection to the RTC.
 }
 //--------- SETUP END ---------//
 
@@ -164,6 +219,11 @@ void loop() {
     else if (intRead == '3')                    // Command "2" from the command list.
     { 
       lightsOff();                              // Run function to turn off lights.
+      delay(5);                                 // Pause for stability.
+    }
+    else if (intRead == '4')                    // Command "2" from the command list.
+    { 
+      printDate();                              // Run function to turn off lights.
       delay(5);                                 // Pause for stability.
     }
     else if (intRead == '0')                    // Command "2" from the command list.
