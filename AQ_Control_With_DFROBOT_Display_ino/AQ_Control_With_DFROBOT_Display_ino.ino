@@ -1,9 +1,10 @@
 /*-----------------------
        Cammand List
   -----------------------
-  1.) Get temprature.
+  1.) Print temprature.
   2.) Turn on light.
   3.) Turn off light.
+  4.) Print time from RTC.
   -----------------------
   0.) Get sensor address.
   -----------------------
@@ -30,13 +31,13 @@ int monthDay;                                   // This will hold the day of the
 int month;                                      // This will hold the month of the time
 int year;                                       // This will hold the year of the time
 float temp;                                     // Temprature of the water.
-byte zero = 0x00;                               //workaround for issue #527
+byte zero = 0x00;                               // Workaround for issue #527
 byte i;
 byte present = 0;
 byte data[12];                                  // This will hold the data returned by sensor.
 byte addr[8];                                   // This will hold the address of the sensor.
 OneWire ds(sensor);                             // Select pin wher DS18B22 is connected.
-LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // initialize the library with the numbers of the interface pins.
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // Initialize the library with the numbers of the interface pins.
 
 //-----------------------------------
 //     Function to convert time.
@@ -54,8 +55,8 @@ byte bcdToDec(byte val)  {
 //-----------------------------------
 // This gets the time from the DS1307
 //-----------------------------------
-void printDate(){
 
+void getDate() {
   // Reset the register pointer
   Wire.beginTransmission(DS1307_ADDRESS);
   Wire.write(zero);
@@ -70,9 +71,15 @@ void printDate(){
   monthDay = bcdToDec(Wire.read());
   month = bcdToDec(Wire.read());
   year = bcdToDec(Wire.read());
+}
 
-  //print the date EG 23:59:59
-
+//-----------------------------------
+//      Function to print time.
+//-----------------------------------
+// Print the date EG 23:59:59
+//-----------------------------------
+void printDate(){
+  
   Serial.print(hour);
   Serial.print(":");
   Serial.print(minute);
@@ -161,7 +168,7 @@ void lightsOn() {
 //hexidecimal.
 //-------------------------------------
 void getAddr() {
-  for( i=0; i < 8; i++) {
+  for ( i=0; i < 8; i++) {
       Serial.print("0x");
       if (addr[i] < 16) {
         Serial.print('0');                      // Add a leading '0' if required.
@@ -223,7 +230,7 @@ void loop() {
     }
     else if (intRead == '4')                    // Command "2" from the command list.
     { 
-      printDate();                              // Run function to turn off lights.
+      printDate();                              // Print date to console.
       delay(5);                                 // Pause for stability.
     }
     else if (intRead == '0')                    // Command "2" from the command list.
@@ -232,12 +239,23 @@ void loop() {
       delay(5);                                 // Pause for stability.
     }
   }
-  delay(1000);                                  // wait for stability.
+  
+  delay(500);                                   // wait for stability.
   getTemp();                                    // Run function to get temprature.
   lcd.setCursor(0, 1);                          // Set LCD cursor to charater 0 on 2nd. line.
   lcd.print(temp);                              // Write temp to LCD.
   lcd.setCursor(5, 1);                          // Set LCD cursor to charater 5 on 2nd line.
   lcd.print("C");                               // Put a C on it LCD edition.
+  getDate();
+  
+  if(hour == 22) {
+    lightsOff();                              // Run function to turn off lights.
+    delay(5);                                 // Pause for stability.
+  }
+  else if (hour == 10) {
+    lightsOn();                               // Run function to turn on lights.
+    delay(5);                                 // Pause for stability.
+  }
   
   if (temp < 24.00) {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
@@ -249,7 +267,18 @@ void loop() {
   }
   else {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
-    lcd.print("AQ-Control      ");              // Write standard text on screen.
+    lcd.print("AQ-Control ");                   // Write standard text on screen.
+    lcd.print(hour);
+    lcd.print(":");
+    
+    // Making sure no number is left on display.
+    if (minute < 10) {
+      lcd.print("0");
+      lcd.print(minute);
+    }
+    else {
+      lcd.print(minute);
+    }
   }
 }
 //--------- LOOP END ---------//
