@@ -21,8 +21,7 @@
 #include <OneWire.h>
 #include <LiquidCrystal.h>
 
-int intRead;                                    // int to identify command chosen.
-//int sensor = 14;                                
+int intRead;                                    // int to identify command chosen.                             
 int second;                                     // This will hold the second of the time
 int minute;                                     // This will hold the minute of the time
 int hour;                                       // This will hold the hour of the time
@@ -30,6 +29,9 @@ int weekDay;                                    // This will hold the day of the
 int monthDay;                                   // This will hold the day of the mounth of the time
 int month;                                      // This will hold the month of the time
 int year;                                       // This will hold the year of the time
+int light = 0;
+int offTime = 22;
+int onTime = 10;
 float temp;                                     // Temprature of the water.
 byte zero = 0x00;                               // Workaround for issue #527
 byte i;
@@ -149,6 +151,7 @@ void lightsOff() {
   digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
   delay(3000);                                  // Wait for a while.
   digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
+  light = 0;
 }
 void lightsOn() {
   digitalWrite(RELAY4,LOW);                     // Turn off light 4.
@@ -158,6 +161,7 @@ void lightsOn() {
   digitalWrite(RELAY2,LOW);                     // Turn off light 2
   delay(3000);                                  // Wait for a while.
   digitalWrite(RELAY1,LOW);                     // Turn off light 1.
+  light = 1;
 }
 
 //-------------------------------------
@@ -194,6 +198,8 @@ void setup() {
   Serial.begin(9600);                           // Enable serial communication.
   lcd.begin(16, 2);                             // LCD colums, rows.
   Wire.begin();                                 // Start the connection to the RTC.
+  lightsOn();                               // Run function to turn on lights.
+  delay(5);                                 // Pause for stability.
 }
 //--------- SETUP END ---------//
 
@@ -248,14 +254,22 @@ void loop() {
   lcd.print("C");                               // Put a C on it LCD edition.
   getDate();
   
-  if(hour == 22) {
-    lightsOff();                              // Run function to turn off lights.
-    delay(5);                                 // Pause for stability.
+  //---- Light controlled by time ----//
+  if(hour >= offTime || hour < onTime) {
+    if (light == 1)
+    {
+      lightsOff();                              // Run function to turn off lights.
+      delay(5);                                 // Pause for stability.
+    }
   }
-  else if (hour == 10) {
-    lightsOn();                               // Run function to turn on lights.
-    delay(5);                                 // Pause for stability.
+  else if (hour >= onTime && hour < offTime) {
+    if (light == 0)
+    {
+      lightsOn();                               // Run function to turn off lights.
+      delay(5);                                 // Pause for stability.
+    }
   }
+  //----------------------------------//
   
   if (temp < 24.00) {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
