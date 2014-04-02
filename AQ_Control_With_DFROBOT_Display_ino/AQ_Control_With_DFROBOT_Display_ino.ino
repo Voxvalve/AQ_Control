@@ -267,11 +267,18 @@ void loop() {
   }
   else {
     lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
-    lcd.print("AQ-Control ");                   // Write standard text on screen.
-    lcd.print(hour);
-    lcd.print(":");
+    lcd.print("AQ-Control ");                   // Write standard text on screen.    
     
     // Making sure no number is left on display.
+    if (hour < 10) {
+      lcd.print("0");
+      lcd.print(hour);
+      lcd.print(":");
+    }
+    else {
+      lcd.print(hour);
+      lcd.print(":");
+    }
     if (minute < 10) {
       lcd.print("0");
       lcd.print(minute);
