@@ -4,8 +4,9 @@ AQ_Control
 AQ_Control is an Arduino aquarium control system.
 
 
+
 THE STORY:
--------------
+--------------------------
 It all started with me wanting something better then just a thermometer in each end og my 100cm long aquarium.
 When i figured out how easy that was to do with an arduino i thought why not do more. 
 also at this point there was alot of empty port on the Arduino UNO.
@@ -16,8 +17,9 @@ now i have all that sorted and i am currently testing the system untill i reciev
 that i actually ordered as the first thing when i started the project but still haven't recievded for some reason.....
 
 
+
 PARTS I USED:
--------------
+--------------------------
 1 x Arduino UNO.
 
 2 x DS18B20.
@@ -39,3 +41,12 @@ Laser printer with photo paper.
 An iron.
 
 Soldering iron
+
+
+
+FEATURES FOR LATER
+--------------------------
+ - Web service for monitoring.
+ - Email alert system.
+ - Dynamic temprature control.
+ - Automatic feeding system.
