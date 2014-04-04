@@ -1,7 +1,7 @@
 AQ_Control
 ==========
 
-AQ_Control (Arduino aquarium control system.)
+AQ_Control is an Arduino aquarium control system.
 
 
 THE STORY:
