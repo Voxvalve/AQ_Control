@@ -12,13 +12,14 @@
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
 #define DS1307_ADDRESS 0x68
-#define sensor 14
+#define ONE_WIRE_BUS_PIN 14
 #define RELAY1 8
 #define RELAY2 9
 #define RELAY3 10
 #define RELAY4 11
 #include <Wire.h>
 #include <OneWire.h>
+#include <DallasTemperature.h>
 #include <LiquidCrystal.h>
 
 int intRead;                                    // int to identify command chosen.                             
@@ -32,14 +33,21 @@ int year;                                       // This will hold the year of th
 int light = 0;
 int offTime = 22;
 int onTime = 10;
-float temp;                                     // Temprature of the water.
+float temp;                                     // Holds temprature value of current read.
+float temp1;                                    // Temprature of the water.
+float temp2;                                    // Temprature of the water.
 byte zero = 0x00;                               // Workaround for issue #527
 byte i;
 byte present = 0;
 byte data[12];                                  // This will hold the data returned by sensor.
 byte addr[8];                                   // This will hold the address of the sensor.
-OneWire ds(sensor);                             // Select pin wher DS18B22 is connected.
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // Initialize the library with the numbers of the interface pins.
+OneWire oneWire(ONE_WIRE_BUS_PIN);
+DallasTemperature sensors(&oneWire);
+
+// Temprature sensor's addresses.
+DeviceAddress Probe01 = { 0x28, 0x60, 0xB3, 0xA0, 0x05, 0x00, 0x00, 0x40 }; 
+DeviceAddress Probe02 = { 0x28, 0xAD, 0x7A, 0xA0, 0x05, 0x00, 0x00, 0x44 };
 
 //-----------------------------------
 //     Function to convert time.
@@ -97,42 +105,19 @@ void printDate(){
 // the DS18B20's Connected to pin 14
 // and converts it to degrees celsius.
 //-----------------------------------
-boolean getTemp(){
- 
-  temp = 00.00;                                 // Debug purpose.
-  
-  // If device not found on addr return false.
-  if (!ds.search(addr)) {                       // Search for devices.
-    ds.reset_search();                          // Clear search state.
-    //return false;
-  }
+void printTemperature(DeviceAddress deviceAddress)
+{
 
-  if (OneWire::crc8( addr, 7) != addr[7]) {
-    return false;
-  }
-  
-  if (addr[0] != DS18B20_ID) {
-    return false;
-  }
-  
-  ds.reset();                                   // Reset cycle to see if device still present.
-  ds.select(addr);                              // Select rom after reset.
-  
-  ds.write(0x44, 1);                            // Start conversion
-  
-  delay(50);                                    // Wait some time.
-  present = ds.reset();                         // Check if DS18B22 is present.
-  ds.select(addr);                              // Select rom command addr 8.
-  
-  ds.write(0xBE);                               // Issue Read scratchpad command
-   
-  // Receive 9 bytes
-  for ( i = 0; i < 9; i++) {
-    data[i] = ds.read();
-  }
-   
-  temp = ( (data[1] << 8) + data[0] )*0.0625;   // Calculate temperature value  
-  return true;
+float tempC = sensors.getTempC(deviceAddress);
+
+   if (tempC == -127.00) 
+   {
+     Serial.print("Error getting temperature  ");
+   } 
+   else
+   {
+     temp = tempC);
+   }
 }
 
 //-------------------------------------
@@ -198,60 +183,31 @@ void setup() {
   Serial.begin(9600);                           // Enable serial communication.
   lcd.begin(16, 2);                             // LCD colums, rows.
   Wire.begin();                                 // Start the connection to the RTC.
-  lightsOn();                               // Run function to turn on lights.
-  delay(5);                                 // Pause for stability.
+  lightsOn();                                   // Run function to turn on lights.
+  delay(5);                                     // Pause for stability.
+  sensors.setResolution(Probe01, 10);
+  sensors.setResolution(Probe02, 10);
 }
 //--------- SETUP END ---------//
 
 //-------- LOOP START--------//
 void loop() {
-  //-----------------------------
-  //  Get command from serial
-  //  and run the command listed.
-  //-----------------------------
-  // This will handle input from
-  // the serial connection, and
-  // run the functions requested
-  // by the user/control unite.
-  //-----------------------------
-  if (Serial.available()) {                     // read from serial.
-    intRead = Serial.read();                    // Read the most recent int.    
-    
-    if (intRead == '1')                         // Command "1"from the command list.
-    {      
-      getTemp();                                // Run function to get temprature.
-      delay(5);                                 // Pause for stability.
-      Serial.print(temp);                       // Print temprature to serial.
-      Serial.println("C");                      // Put a C on it!.
-    }
-    else if (intRead == '2')                    // Command "2" from the command list.
-    { 
-      lightsOn();                               // Run function to turn on lights.
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '3')                    // Command "2" from the command list.
-    { 
-      lightsOff();                              // Run function to turn off lights.
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '4')                    // Command "2" from the command list.
-    { 
-      printDate();                              // Print date to console.
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '0')                    // Command "2" from the command list.
-    {
-      getAddr();                                // Run function to control lights.
-      delay(5);                                 // Pause for stability.
-    }
-  }
   
-  delay(500);                                   // wait for stability.
-  getTemp();                                    // Run function to get temprature.
+  delay(200);                                   // wait for stability.
+  sensors.requestTemperatures();
+  printTemperature(Probe01);
+  temp1 = temp;
+  printTemperature(Probe02);
+  temp2 = temp;
+  
   lcd.setCursor(0, 1);                          // Set LCD cursor to charater 0 on 2nd. line.
-  lcd.print(temp);                              // Write temp to LCD.
+  lcd.print(temp1);                              // Write temp to LCD.
   lcd.setCursor(5, 1);                          // Set LCD cursor to charater 5 on 2nd line.
   lcd.print("C");                               // Put a C on it LCD edition.
+  lcd.setCursor(10, 1);                          // Set LCD cursor to charater 0 on 2nd. line.
+  lcd.print(temp2);                              // Write temp to LCD.
+  lcd.setCursor(16, 1);                          // Set LCD cursor to charater 5 on 2nd line.
+  lcd.print("C");
   getDate();
   
   //---- Light controlled by time ----//
@@ -301,6 +257,49 @@ void loop() {
       lcd.print(minute);
     }
   }
+  
+  //-----------------------------
+  //  Get command from serial
+  //  and run the command listed.
+  //-----------------------------
+  // This will handle input from
+  // the serial connection, and
+  // run the functions requested
+  // by the user/control unite.
+  //-----------------------------
+  if (Serial.available()) {                     // read from serial.
+    intRead = Serial.read();                    // Read the most recent int.    
+    
+    if (intRead == '1')                         // Command "1"from the command list.
+    {      
+      delay(5);                                 // Pause for stability.
+      Serial.print(temp1);                      // Print temprature to serial.
+      Serial.println("C");                      // Put a C on it!.
+      Serial.print(temp12;                      // Print temprature to serial.
+      Serial.println("C");                      // Put a C on it!
+    }
+    else if (intRead == '2')                    // Command "2" from the command list.
+    { 
+      lightsOn();                               // Run function to turn on lights.
+      delay(5);                                 // Pause for stability.
+    }
+    else if (intRead == '3')                    // Command "2" from the command list.
+    { 
+      lightsOff();                              // Run function to turn off lights.
+      delay(5);                                 // Pause for stability.
+    }
+    else if (intRead == '4')                    // Command "2" from the command list.
+    { 
+      printDate();                              // Print date to console.
+      delay(5);                                 // Pause for stability.
+    }
+    else if (intRead == '0')                    // Command "2" from the command list.
+    {
+      getAddr();                                // Run function to control lights.
+      delay(5);                                 // Pause for stability.
+    }
+  }  
 }
 //--------- LOOP END ---------//
+
 
