@@ -105,18 +105,17 @@ void printDate(){
 // the DS18B20's Connected to pin 14
 // and converts it to degrees celsius.
 //-----------------------------------
-void printTemperature(DeviceAddress deviceAddress)
-{
+void printTemperature(DeviceAddress deviceAddress) {
 
 float tempC = sensors.getTempC(deviceAddress);
 
    if (tempC == -127.00) 
    {
      Serial.print("Error getting temperature  ");
-   } 
+   }
    else
    {
-     temp = tempC);
+     temp = tempC;
    }
 }
 
@@ -206,7 +205,7 @@ void loop() {
   lcd.print("C");                               // Put a C on it LCD edition.
   lcd.setCursor(10, 1);                          // Set LCD cursor to charater 0 on 2nd. line.
   lcd.print(temp2);                              // Write temp to LCD.
-  lcd.setCursor(16, 1);                          // Set LCD cursor to charater 5 on 2nd line.
+  lcd.setCursor(15, 1);                          // Set LCD cursor to charater 5 on 2nd line.
   lcd.print("C");
   getDate();
   
@@ -275,7 +274,7 @@ void loop() {
       delay(5);                                 // Pause for stability.
       Serial.print(temp1);                      // Print temprature to serial.
       Serial.println("C");                      // Put a C on it!.
-      Serial.print(temp12;                      // Print temprature to serial.
+      Serial.print(temp2);                      // Print temprature to serial.
       Serial.println("C");                      // Put a C on it!
     }
     else if (intRead == '2')                    // Command "2" from the command list.
