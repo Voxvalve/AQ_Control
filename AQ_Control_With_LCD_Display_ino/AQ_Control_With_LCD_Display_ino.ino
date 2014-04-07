@@ -167,10 +167,10 @@ void getAddr() {
 
 //-------- SETUP START --------//
 void setup() {
-  pinMode(RELAY1, OUTPUT);                      // Set RELAY1(pin 14) to output.
-  pinMode(RELAY2, OUTPUT);                      // Set RELAY2(pin 15) to output.
-  pinMode(RELAY3, OUTPUT);                      // Set RELAY3(pin 16) to output.
-  pinMode(RELAY4, OUTPUT);                      // Set RELAY3(pin 17) to output.
+  pinMode(RELAY1, OUTPUT);                      
+  pinMode(RELAY2, OUTPUT);                      
+  pinMode(RELAY3, OUTPUT);                      
+  pinMode(RELAY4, OUTPUT);                      
   Serial.begin(9600);                           // Enable serial communication.
   lcd.begin(16, 2);                             // LCD number of colums and rows.
   Wire.begin();                                 // Start the connection to the RTC.
@@ -192,11 +192,11 @@ void loop() {
   temp2 = temp;
   
   lcd.setCursor(0, 1);                          
-  lcd.print(temp1);                             // Write temp from sensor1 to LCD.
+  lcd.print(temp1);                             // Write temprature from sensor1 to LCD.
   lcd.setCursor(5, 1);                          
   lcd.print("C");                               
   lcd.setCursor(10, 1);                         
-  lcd.print(temp2);                             // Write temp from sensor2 to LCD.
+  lcd.print(temp2);                             // Write temprature from sensor2 to LCD.
   lcd.setCursor(15, 1);                         
   lcd.print("C");
   getDate();
