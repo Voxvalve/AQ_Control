@@ -91,7 +91,6 @@ void printDate(){
   Serial.print(minute);
   Serial.print(":");
   Serial.println(second);
-
 }
 
 //-----------------------------------
@@ -143,27 +142,6 @@ void lightsOn() {
   digitalWrite(RELAY1,LOW);                     // Turn off light 1.
   light = 1;
 }
-
-//-------------------------------------
-//       Get sensor address.
-//-------------------------------------
-//This function will assemble the
-//address of the sensor and print in
-//hexidecimal.
-//-------------------------------------
-/*void getAddr() {
-  for (i = 0; i < 8; i++) {
-      Serial.print("0x");
-      if (addr[i] < 16) {
-        Serial.print('0');                      // Add a leading '0' if required.
-      }
-      Serial.print(addr[i], HEX);               // print the actual value in HEX
-      if (i < 7) {
-        Serial.print(", ");                     // Print comma between the values.
-      }
-    }
-  Serial.print("\r\n");                         // New line after print.
-}*/
 
 //-------- SETUP START --------//
 void setup() {
@@ -287,5 +265,3 @@ void loop() {
   }  
 }
 //--------- LOOP END ---------//
-
-
