@@ -222,7 +222,7 @@ void loop() {
     lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP LO ");              // Warning for low temprature.
   }
-  else if (temp > 27.70) {
+  else if (temp > 27.20) {
     lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP HI ");              // Warning for high temprature.
   }
