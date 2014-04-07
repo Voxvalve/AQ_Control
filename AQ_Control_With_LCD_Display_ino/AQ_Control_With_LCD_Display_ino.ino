@@ -6,8 +6,6 @@
   3.) Turn off light.
   4.) Print time from RTC.
   -----------------------
-  0.) Get sensor address.
-  -----------------------
 */
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
@@ -23,24 +21,22 @@
 #include <LiquidCrystal.h>
 
 int intRead;                                    // int to identify command chosen.                             
-int second;                                     // This will hold the second of the time
-int minute;                                     // This will hold the minute of the time
-int hour;                                       // This will hold the hour of the time
-int weekDay;                                    // This will hold the day of the week of the time
-int monthDay;                                   // This will hold the day of the mounth of the time
-int month;                                      // This will hold the month of the time
-int year;                                       // This will hold the year of the time
-int light = 0;
-int offTime = 22;
-int onTime = 10;
+int second;                                     // Holds the second of the time.
+int minute;                                     // Holds the minute of the time.
+int hour;                                       // Holds the hour of the time.
+int weekDay;                                    // Holds the day of the week of the time.
+int monthDay;                                   // Holds the day of the mounth of the time.
+int month;                                      // Holds the month of the time.
+int year;                                       // Holds the year of the time.
+int light = 0;                                  // State of lights (1 = On or 0 = Off).
+int offTime = 22;                               // Hour of the day to turn off lights.
+int onTime = 10;                                // Hour of the day to turn ofn lights.
 float temp;                                     // Holds temprature value of current read.
-float temp1;                                    // Temprature of the water.
-float temp2;                                    // Temprature of the water.
-byte zero = 0x00;                               // Workaround for issue #527
+float temp1;                                    // Temprature of sensor1.
+float temp2;                                    // Temprature of sensor2.
+byte zero = 0x00;                               // Workaround for issue #527 in RTC.
 byte i;
 byte present = 0;
-byte data[12];                                  // This will hold the data returned by sensor.
-byte addr[8];                                   // This will hold the address of the sensor.
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // Initialize the library with the numbers of the interface pins.
 OneWire oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature sensors(&oneWire);
@@ -76,8 +72,8 @@ void getDate() {
 
   second = bcdToDec(Wire.read());
   minute = bcdToDec(Wire.read());
-  hour = bcdToDec(Wire.read() & 0b111111); //24 hour time
-  weekDay = bcdToDec(Wire.read()); //0-6 -> sunday - Saturday
+  hour = bcdToDec(Wire.read() & 0b111111);       //24 hour time
+  weekDay = bcdToDec(Wire.read());               //0-6 -> sunday - Saturday
   monthDay = bcdToDec(Wire.read());
   month = bcdToDec(Wire.read());
   year = bcdToDec(Wire.read());
@@ -129,21 +125,21 @@ float tempC = sensors.getTempC(deviceAddress);
 //-------------------------------------
 void lightsOff() {
   digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
-  delay(3000);                                  // Wait for a while.
+  delay(3000);                                  
   digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
-  delay(3000);                                  // Wait for a while.
+  delay(3000);                                  
   digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
-  delay(3000);                                  // Wait for a while.
+  delay(3000);                                  
   digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
   light = 0;
 }
 void lightsOn() {
   digitalWrite(RELAY4,LOW);                     // Turn off light 4.
-  delay(3000);                                  // Wait for a while.
+  delay(3000);                                  
   digitalWrite(RELAY3,LOW);                     // Turn off light 3.
-  delay(3000);                                  // Wait for a while.
+  delay(3000);                                  
   digitalWrite(RELAY2,LOW);                     // Turn off light 2
-  delay(3000);                                  // Wait for a while.
+  delay(3000);                                  
   digitalWrite(RELAY1,LOW);                     // Turn off light 1.
   light = 1;
 }
@@ -156,7 +152,7 @@ void lightsOn() {
 //hexidecimal.
 //-------------------------------------
 void getAddr() {
-  for ( i=0; i < 8; i++) {
+  for (i = 0; i < 8; i++) {
       Serial.print("0x");
       if (addr[i] < 16) {
         Serial.print('0');                      // Add a leading '0' if required.
@@ -175,14 +171,10 @@ void setup() {
   pinMode(RELAY2, OUTPUT);                      // Set RELAY2(pin 15) to output.
   pinMode(RELAY3, OUTPUT);                      // Set RELAY3(pin 16) to output.
   pinMode(RELAY4, OUTPUT);                      // Set RELAY3(pin 17) to output.
-  digitalWrite(RELAY1,LOW);                     // Turn off light 1 by default.
-  digitalWrite(RELAY2,LOW);                     // Turn off light 2 by default.
-  digitalWrite(RELAY3,LOW);                     // Turn off light 3 by default.
-  digitalWrite(RELAY4,LOW);                     // Turn off light 4 by default.
   Serial.begin(9600);                           // Enable serial communication.
-  lcd.begin(16, 2);                             // LCD colums, rows.
+  lcd.begin(16, 2);                             // LCD number of colums and rows.
   Wire.begin();                                 // Start the connection to the RTC.
-  lightsOn();                                   // Run function to turn on lights.
+  lightsOn();                                   // Turn lights on by default.
   delay(5);                                     // Pause for stability.
   sensors.setResolution(Probe01, 10);
   sensors.setResolution(Probe02, 10);
@@ -192,20 +184,20 @@ void setup() {
 //-------- LOOP START--------//
 void loop() {
   
-  delay(200);                                   // wait for stability.
+  delay(250);                                   // Wait for stability.
   sensors.requestTemperatures();
-  printTemperature(Probe01);
+  printTemperature(Probe01);                    // Get temprature from sensor1.
   temp1 = temp;
-  printTemperature(Probe02);
+  printTemperature(Probe02);                    // Get temprature from sensor2.
   temp2 = temp;
   
-  lcd.setCursor(0, 1);                          // Set LCD cursor to charater 0 on 2nd. line.
-  lcd.print(temp1);                              // Write temp to LCD.
-  lcd.setCursor(5, 1);                          // Set LCD cursor to charater 5 on 2nd line.
-  lcd.print("C");                               // Put a C on it LCD edition.
-  lcd.setCursor(10, 1);                          // Set LCD cursor to charater 0 on 2nd. line.
-  lcd.print(temp2);                              // Write temp to LCD.
-  lcd.setCursor(15, 1);                          // Set LCD cursor to charater 5 on 2nd line.
+  lcd.setCursor(0, 1);                          
+  lcd.print(temp1);                             // Write temp from sensor1 to LCD.
+  lcd.setCursor(5, 1);                          
+  lcd.print("C");                               
+  lcd.setCursor(10, 1);                         
+  lcd.print(temp2);                             // Write temp from sensor2 to LCD.
+  lcd.setCursor(15, 1);                         
   lcd.print("C");
   getDate();
   
@@ -227,15 +219,15 @@ void loop() {
   //----------------------------------//
   
   if (temp < 24.00) {
-    lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
+    lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP LO ");              // Warning for low temprature.
   }
   else if (temp > 27.70) {
-    lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
+    lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP HI ");              // Warning for high temprature.
   }
   else {
-    lcd.setCursor(0, 0);                        // Set LCD cursor before writing.
+    lcd.setCursor(0, 0);                        
     lcd.print("AQ-Control ");                   // Write standard text on screen.    
     
     // Making sure no number is left on display.
@@ -272,29 +264,24 @@ void loop() {
     if (intRead == '1')                         // Command "1"from the command list.
     {      
       delay(5);                                 // Pause for stability.
-      Serial.print(temp1);                      // Print temprature to serial.
-      Serial.println("C");                      // Put a C on it!.
-      Serial.print(temp2);                      // Print temprature to serial.
-      Serial.println("C");                      // Put a C on it!
+      Serial.print(temp1);                      // Print temprature from sensor1 to serial.
+      Serial.println("C");                      
+      Serial.print(temp2);                      // Print temprature from sensor2 to serial.
+      Serial.println("C");                      
     }
     else if (intRead == '2')                    // Command "2" from the command list.
     { 
-      lightsOn();                               // Run function to turn on lights.
+      lightsOn();                               // Turn on lights.
       delay(5);                                 // Pause for stability.
     }
-    else if (intRead == '3')                    // Command "2" from the command list.
+    else if (intRead == '3')                    // Command "3" from the command list.
     { 
-      lightsOff();                              // Run function to turn off lights.
+      lightsOff();                              // Turn off lights.
       delay(5);                                 // Pause for stability.
     }
-    else if (intRead == '4')                    // Command "2" from the command list.
+    else if (intRead == '4')                    // Command "4" from the command list.
     { 
-      printDate();                              // Print date to console.
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '0')                    // Command "2" from the command list.
-    {
-      getAddr();                                // Run function to control lights.
+      printDate();                              // Print date time to console.
       delay(5);                                 // Pause for stability.
     }
   }  
