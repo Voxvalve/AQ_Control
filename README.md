@@ -13,8 +13,9 @@ also at this point there was alot of empty port on the Arduino UNO.
 Then i figured that i might aswell do the light control with also.
 After a while playing around with the date time stuff and having to set the time every time i flashed 
 i went on amazon and ordered a DS1307 RCT to solve it(It works great!).
-now i have all that sorted and i am currently testing the system untill i recieve my DS18B20's 
-that i actually ordered as the first thing when i started the project but still haven't recievded for some reason.....
+now i have all that sorted and i am currently testing the system.
+So far everything seems to be working, Tempratures are read and displayed with great precision,
+And lights are turned on/off at the specified time.
 
 
 
