@@ -35,8 +35,8 @@ float temp;                                     // Holds temprature value of cur
 float temp1;                                    // Temprature of sensor1.
 float temp2;                                    // Temprature of sensor2.
 byte zero = 0x00;                               // Workaround for issue #527 in RTC.
-byte i;
-byte present = 0;
+//byte i;
+//byte present = 0;
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // Initialize the library with the numbers of the interface pins.
 OneWire oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature sensors(&oneWire);
@@ -151,7 +151,7 @@ void lightsOn() {
 //address of the sensor and print in
 //hexidecimal.
 //-------------------------------------
-void getAddr() {
+/*void getAddr() {
   for (i = 0; i < 8; i++) {
       Serial.print("0x");
       if (addr[i] < 16) {
@@ -163,7 +163,7 @@ void getAddr() {
       }
     }
   Serial.print("\r\n");                         // New line after print.
-}
+}*/
 
 //-------- SETUP START --------//
 void setup() {
