@@ -5,8 +5,8 @@
   2.) Turn on light.
   3.) Turn off light.
   4.) Print time from RTC.
-  -----------------------
-*/
+  -----------------------*/
+  
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
 #define DS1307_ADDRESS 0x68
@@ -20,23 +20,25 @@
 #include <DallasTemperature.h>
 #include <LiquidCrystal.h>
 
-int intRead;                                    // int to identify command chosen.                             
-int second;                                     // Holds the second of the time.
-int minute;                                     // Holds the minute of the time.
-int hour;                                       // Holds the hour of the time.
-int weekDay;                                    // Holds the day of the week of the time.
-int monthDay;                                   // Holds the day of the mounth of the time.
-int month;                                      // Holds the month of the time.
-int year;                                       // Holds the year of the time.
+
+// -- Variables to hold RTC --
+int second;                                     
+int minute;                                     
+int hour;                                       
+int weekDay;                                    
+int monthDay;                                   
+int month;                                      
+int year;                                       
+// ---------------------------
+
+int intRead;                                    // int to identify command chosen.
 int light = 0;                                  // State of lights (1 = On or 0 = Off).
 int offTime = 22;                               // Hour of the day to turn off lights.
-int onTime = 10;                                // Hour of the day to turn ofn lights.
+int onTime = 10;                                // Hour of the day to turn on lights.
 float temp;                                     // Holds temprature value of current read.
-float temp1;                                    // Temprature of sensor1.
-float temp2;                                    // Temprature of sensor2.
+float temp1;                                    // Holds temprature of sensor1.
+float temp2;                                    // Holds temprature of sensor2.
 byte zero = 0x00;                               // Workaround for issue #527 in RTC.
-//byte i;
-//byte present = 0;
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);            // Initialize the library with the numbers of the interface pins.
 OneWire oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature sensors(&oneWire);
@@ -241,11 +243,11 @@ void loop() {
     
     if (intRead == '1')                         // Command "1"from the command list.
     {      
-      delay(5);                                 // Pause for stability.
       Serial.print(temp1);                      // Print temprature from sensor1 to serial.
       Serial.println("C");                      
       Serial.print(temp2);                      // Print temprature from sensor2 to serial.
-      Serial.println("C");                      
+      Serial.println("C");
+      delay(5);                                 // Pause for stability.
     }
     else if (intRead == '2')                    // Command "2" from the command list.
     { 
