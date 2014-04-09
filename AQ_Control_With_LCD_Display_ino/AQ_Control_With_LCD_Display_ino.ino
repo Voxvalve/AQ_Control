@@ -1,11 +1,11 @@
-/*-----------------------
-       Cammand List
-  -----------------------
-  1.) Print temprature.
-  2.) Turn on light.
-  3.) Turn off light.
-  4.) Print time from RTC.
-  -----------------------*/
+/*! \Cammand List
+*      Commands that can used from a serial connection.
+*
+*   1.) Print temprature.
+*   2.) Turn on light.
+*   3.) Turn off light.
+*   4.) Print time from RTC.
+*/
   
 #define DS18S20_ID 0x10
 #define DS18B20_ID 0x28
@@ -47,23 +47,22 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress Probe01 = { 0x28, 0x60, 0xB3, 0xA0, 0x05, 0x00, 0x00, 0x40 }; 
 DeviceAddress Probe02 = { 0x28, 0xAD, 0x7A, 0xA0, 0x05, 0x00, 0x00, 0x44 };
 
-//-----------------------------------
-//     Function to convert time.
-//-----------------------------------
-// Convert binary coded decimal 
-// to normal decimal numbers.
-//-----------------------------------
+/*! \Function to convert time.
+*      bcdToDec();
+*
+*   Convert binary coded decimal 
+*   to normal decimal numbers.
+*/
 byte bcdToDec(byte val)  {
 
   return ( (val/16*10) + (val%16) );
 }
 
-//-----------------------------------
-//      Function to get time.
-//-----------------------------------
-// This gets the time from the DS1307
-//-----------------------------------
-
+/*! \Function to get time.
+*      getDate();
+*
+*   This gets the time from the DS1307
+*/
 void getDate() {
   // Reset the register pointer
   Wire.beginTransmission(DS1307_ADDRESS);
@@ -81,11 +80,11 @@ void getDate() {
   year = bcdToDec(Wire.read());
 }
 
-//-----------------------------------
-//      Function to print time.
-//-----------------------------------
-// Print the date EG 23:59:59
-//-----------------------------------
+/*! \Function to print time.
+*      printDate();
+*
+*   Print the date EG 23:59:59
+*/
 void printDate(){
   
   Serial.print(hour);
@@ -95,16 +94,16 @@ void printDate(){
   Serial.println(second);
 }
 
-//-----------------------------------
-//    Function to get temperature.
-//-----------------------------------
-// This gets the tempreature from
-// the DS18B20's Connected to pin 14
-// and converts it to degrees celsius.
-//-----------------------------------
+/*! \Function to get temperature.
+*      printTemperature();
+*
+*   This gets the tempreature from
+*   the DS18B20's Connected to pin 14
+*   and converts it to degrees celsius.
+*/
 void printTemperature(DeviceAddress deviceAddress) {
 
-float tempC = sensors.getTempC(deviceAddress);
+   float tempC = sensors.getTempC(deviceAddress);
 
    if (tempC == -127.00) 
    {
@@ -116,24 +115,14 @@ float tempC = sensors.getTempC(deviceAddress);
    }
 }
 
-//-------------------------------------
-//     Control Lights ON/OFF.
-//-------------------------------------
-//This function will control the lights.
-//it will serve as the way for the timer
-//to turn the lights on and off at a 
-//specific time of the day.
-//-------------------------------------
-void lightsOff() {
-  digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
-  delay(3000);                                  
-  digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
-  delay(3000);                                  
-  digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
-  delay(3000);                                  
-  digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
-  light = 0;
-}
+/*! \Control Lights ON.
+*      lightsON();
+*
+*   This function will control the lights.
+*   it will serve as the way for the timer
+*   to turn the lights on at a 
+*   specific time of the day.
+*/
 void lightsOn() {
   digitalWrite(RELAY4,LOW);                     // Turn off light 4.
   delay(3000);                                  
@@ -143,6 +132,25 @@ void lightsOn() {
   delay(3000);                                  
   digitalWrite(RELAY1,LOW);                     // Turn off light 1.
   light = 1;
+}
+
+/*! \Control Lights Off.
+*      lightsOff();
+*
+*   This function will control the lights.
+*   it will serve as the way for the timer
+*   to turn the lights off at a 
+*   specific time of the day.
+*/
+void lightsOff() {
+  digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
+  delay(3000);                                  
+  digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
+  delay(3000);                                  
+  digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
+  delay(3000);                                  
+  digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
+  light = 0;
 }
 
 //-------- SETUP START --------//
