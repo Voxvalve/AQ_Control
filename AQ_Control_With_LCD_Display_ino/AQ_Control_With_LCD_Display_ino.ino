@@ -206,11 +206,11 @@ void loop() {
   }
   //----------------------------------//
   
-  if (temp < 24.00) {
+  if (temp1 < 24.00 || temp2 < 24.00) {
     lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP LO ");              // Warning for low temprature.
   }
-  else if (temp > 27.20) {
+  else if (temp1 > 27.20 || temp2 > 27.20) {
     lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP HI ");              // Warning for high temprature.
   }
