@@ -4,7 +4,8 @@
 *   1.) Print temprature.
 *   2.) Turn on light.
 *   3.) Turn off light.
-*   4.) Print time from RTC.
+*   4.) Lights Automatic.
+*   5.) Print time from RTC.
 */
   
 #define DS18S20_ID 0x10
@@ -32,7 +33,7 @@ int year;
 // ---------------------------
 
 int intRead;                                    // int to identify command chosen.
-int light = 0;                                  // State of lights (1 = On or 0 = Off).
+int light = 0;                                  // State of lights (0 = Off, 1 = On & 2 = Manual.).
 int offTime = 22;                               // Hour of the day to turn off lights.
 int onTime = 10;                                // Hour of the day to turn on lights.
 float temp;                                     // Holds temprature value of current read.
@@ -125,11 +126,11 @@ void printTemperature(DeviceAddress deviceAddress) {
 */
 void lightsOn() {
   digitalWrite(RELAY4,LOW);                     // Turn off light 4.
-  delay(3000);                                  
+  delay(5000);                                  
   digitalWrite(RELAY3,LOW);                     // Turn off light 3.
-  delay(3000);                                  
+  delay(5000);                                  
   digitalWrite(RELAY2,LOW);                     // Turn off light 2
-  delay(3000);                                  
+  delay(5000);                                  
   digitalWrite(RELAY1,LOW);                     // Turn off light 1.
   light = 1;
 }
@@ -144,11 +145,11 @@ void lightsOn() {
 */
 void lightsOff() {
   digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
-  delay(3000);                                  
+  delay(5000);                                  
   digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
-  delay(3000);                                  
+  delay(5000);                                  
   digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
-  delay(3000);                                  
+  delay(5000);                                  
   digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
   light = 0;
 }
@@ -176,8 +177,11 @@ void loop() {
   sensors.requestTemperatures();
   printTemperature(Probe01);                    // Get temprature from sensor1.
   temp1 = temp;
+  delay(100);                                   // Wait for stability.
   printTemperature(Probe02);                    // Get temprature from sensor2.
   temp2 = temp;
+  
+  delay(250);                                   // Wait for stability.
   
   lcd.setCursor(0, 1);                          
   lcd.print(temp1);                             // Write temprature from sensor1 to LCD.
@@ -260,14 +264,22 @@ void loop() {
     else if (intRead == '2')                    // Command "2" from the command list.
     { 
       lightsOn();                               // Turn on lights.
+      light = 2;
       delay(5);                                 // Pause for stability.
     }
     else if (intRead == '3')                    // Command "3" from the command list.
     { 
       lightsOff();                              // Turn off lights.
+      light = 2;
       delay(5);                                 // Pause for stability.
     }
-    else if (intRead == '4')                    // Command "4" from the command list.
+    else if (intRead == '4')                    // Command "3" from the command list.
+    { 
+      lightsOff();                              // Turn off lights.
+      light = 0;
+      delay(5);                                 // Pause for stability.
+    }
+    else if (intRead == '5')                    // Command "4" from the command list.
     { 
       printDate();                              // Print date time to console.
       delay(5);                                 // Pause for stability.
