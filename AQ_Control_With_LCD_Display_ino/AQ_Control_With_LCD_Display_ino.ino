@@ -125,13 +125,19 @@ void printTemperature(DeviceAddress deviceAddress) {
 *   specific time of the day.
 */
 void lightsOn() {
-  digitalWrite(RELAY4,LOW);                     // Turn off light 4.
+  digitalWrite(RELAY4,LOW);                     // Turn on light 4.
   delay(5000);                                  
-  digitalWrite(RELAY3,LOW);                     // Turn off light 3.
+  digitalWrite(RELAY3,LOW);                     // Turn on light 3.
   delay(5000);                                  
-  digitalWrite(RELAY2,LOW);                     // Turn off light 2
+  digitalWrite(RELAY2,LOW);                     // Turn on light 2
   delay(5000);                                  
-  digitalWrite(RELAY1,LOW);                     // Turn off light 1.
+  digitalWrite(RELAY1,LOW);                     // Turn on light 1.
+  delay(5000);
+  digitalWrite(RELAY2,HIGH);                    // Turn on light 4.
+  delay(5000);                                  
+  digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
+  delay(5000);                                  
+  digitalWrite(RELAY4,HIGH);  
   light = 1;
 }
 
@@ -144,13 +150,19 @@ void lightsOn() {
 *   specific time of the day.
 */
 void lightsOff() {
-  digitalWrite(RELAY1,HIGH);                    // Turn on light 1.
+  digitalWrite(RELAY4,LOW);                     // Turn on light 4.
   delay(5000);                                  
-  digitalWrite(RELAY2,HIGH);                    // Turn on light 2.
+  digitalWrite(RELAY3,LOW);                     // Turn on light 3.
   delay(5000);                                  
-  digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
+  digitalWrite(RELAY2,LOW);                     // Turn on light 2
   delay(5000);                                  
-  digitalWrite(RELAY4,HIGH);                    // Turn on light 4.
+  digitalWrite(RELAY1,HIGH);                    // Turn off light 1.
+  delay(5000);                                  
+  digitalWrite(RELAY2,HIGH);                    // Turn off light 2.
+  delay(5000);                                  
+  digitalWrite(RELAY3,HIGH);                    // Turn off light 3.
+  delay(5000);                                  
+  digitalWrite(RELAY4,HIGH);                    // Turn off light 4.
   light = 0;
 }
 
@@ -173,39 +185,48 @@ void setup() {
 //-------- LOOP START--------//
 void loop() {
   
-  delay(250);                                   // Wait for stability.
+  delay(100);                                   // Wait for stability.
   sensors.requestTemperatures();
+  delay(10);
   printTemperature(Probe01);                    // Get temprature from sensor1.
   temp1 = temp;
   delay(100);                                   // Wait for stability.
   printTemperature(Probe02);                    // Get temprature from sensor2.
   temp2 = temp;
-  
-  delay(250);                                   // Wait for stability.
+  delay(100);                                   // Wait for stability.
   
   lcd.setCursor(0, 1);                          
+  delay(10);
   lcd.print(temp1);                             // Write temprature from sensor1 to LCD.
+  delay(10);
   lcd.setCursor(5, 1);                          
+  delay(10);
   lcd.print("C");                               
+  delay(10);
   lcd.setCursor(10, 1);                         
+  delay(10);
   lcd.print(temp2);                             // Write temprature from sensor2 to LCD.
+  delay(10);
   lcd.setCursor(15, 1);                         
+  delay(10);
   lcd.print("C");
+  delay(10);
   getDate();
+  delay(10);
   
   //---- Light controlled by time ----//
   if(hour >= offTime || hour < onTime) {
     if (light == 1)
     {
       lightsOff();                              // Run function to turn off lights.
-      delay(5);                                 // Pause for stability.
+      delay(10);                                 // Pause for stability.
     }
   }
   else if (hour >= onTime && hour < offTime) {
     if (light == 0)
     {
       lightsOn();                               // Run function to turn off lights.
-      delay(5);                                 // Pause for stability.
+      delay(10);                                 // Pause for stability.
     }
   }
   //----------------------------------//
@@ -220,24 +241,31 @@ void loop() {
   }
   else {
     lcd.setCursor(0, 0);                        
+    delay(10);
     lcd.print("AQ-Control ");                   // Write standard text on screen.    
+    delay(10);
     
     // Making sure no number is left on display.
     if (hour < 10) {
       lcd.print("0");
+      delay(10);
       lcd.print(hour);
+      delay(10);
       lcd.print(":");
     }
     else {
       lcd.print(hour);
+      delay(10);
       lcd.print(":");
     }
     if (minute < 10) {
       lcd.print("0");
+      delay(10);
       lcd.print(minute);
     }
     else {
       lcd.print(minute);
+      delay(10);
     }
   }
   
