@@ -132,7 +132,7 @@ void lightsOn() {
   digitalWrite(RELAY2,LOW);                     // Turn on light 2
   delay(5000);                                  
   digitalWrite(RELAY1,LOW);                     // Turn on light 1.
-  delay(5000);
+  delay(3000);
   digitalWrite(RELAY2,HIGH);                    // Turn on light 4.
   delay(5000);                                  
   digitalWrite(RELAY3,HIGH);                    // Turn on light 3.
