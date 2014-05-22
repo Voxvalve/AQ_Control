@@ -1,5 +1,5 @@
-/*! \Cammand List
-*      Commands that can used from a serial connection.
+/*! \Cammand Lists
+*      Commands that can used from a serial connection for testing functions.
 *
 *   1.) Print temprature.
 *   2.) Turn on light.
@@ -155,7 +155,6 @@ void lightsOff() {
   digitalWrite(RELAY3,LOW);                     // Turn on light 3.
   delay(5000);                                  
   digitalWrite(RELAY2,LOW);                     // Turn on light 2
-  delay(5000);                                  
   digitalWrite(RELAY1,HIGH);                    // Turn off light 1.
   delay(5000);                                  
   digitalWrite(RELAY2,HIGH);                    // Turn off light 2.
@@ -164,6 +163,38 @@ void lightsOff() {
   delay(5000);                                  
   digitalWrite(RELAY4,HIGH);                    // Turn off light 4.
   light = 0;
+}
+
+/*! \Write to LCD temp.
+*      tempLCD();
+*
+*   Writes temprature to display
+*/
+void tempLCD() {
+  sensors.requestTemperatures();
+  delay(10);
+  printTemperature(Probe01);                    // Get temprature from sensor1.
+  temp1 = temp;
+  delay(10);                                    // Wait for stability.
+  printTemperature(Probe02);                    // Get temprature from sensor2.
+  temp2 = temp;
+  delay(10);                                    // Wait for stability.
+  
+  lcd.setCursor(0, 1);                          
+  delay(10);
+  lcd.print(temp1);                             // Write temprature from sensor1 to LCD.
+  delay(10);
+  lcd.setCursor(5, 1);                          
+  delay(10);
+  lcd.print("C");                               
+  delay(10);
+  lcd.setCursor(10, 1);                         
+  delay(10);
+  lcd.print(temp2);                             // Write temprature from sensor2 to LCD.
+  delay(10);
+  lcd.setCursor(15, 1);                         
+  delay(10);
+  lcd.print("C");
 }
 
 //-------- SETUP START --------//
@@ -185,31 +216,7 @@ void setup() {
 //-------- LOOP START--------//
 void loop() {
   
-  delay(100);                                   // Wait for stability.
-  sensors.requestTemperatures();
-  delay(10);
-  printTemperature(Probe01);                    // Get temprature from sensor1.
-  temp1 = temp;
-  delay(100);                                   // Wait for stability.
-  printTemperature(Probe02);                    // Get temprature from sensor2.
-  temp2 = temp;
-  delay(100);                                   // Wait for stability.
-  
-  lcd.setCursor(0, 1);                          
-  delay(10);
-  lcd.print(temp1);                             // Write temprature from sensor1 to LCD.
-  delay(10);
-  lcd.setCursor(5, 1);                          
-  delay(10);
-  lcd.print("C");                               
-  delay(10);
-  lcd.setCursor(10, 1);                         
-  delay(10);
-  lcd.print(temp2);                             // Write temprature from sensor2 to LCD.
-  delay(10);
-  lcd.setCursor(15, 1);                         
-  delay(10);
-  lcd.print("C");
+  tempLCD();
   delay(10);
   getDate();
   delay(10);
@@ -219,17 +226,17 @@ void loop() {
     if (light == 1)
     {
       lightsOff();                              // Run function to turn off lights.
-      delay(10);                                 // Pause for stability.
+      delay(10);                                // Pause for stability.
     }
   }
   else if (hour >= onTime && hour < offTime) {
     if (light == 0)
     {
       lightsOn();                               // Run function to turn off lights.
-      delay(10);                                 // Pause for stability.
+      delay(10);                                // Pause for stability.
     }
   }
-  //----------------------------------//
+  //-- End light controlled by time --//
   
   if (temp1 < 24.00 || temp2 < 24.00) {
     lcd.setCursor(0, 0);                        
@@ -241,31 +248,24 @@ void loop() {
   }
   else {
     lcd.setCursor(0, 0);                        
-    delay(10);
     lcd.print("AQ-Control ");                   // Write standard text on screen.    
-    delay(10);
     
     // Making sure no number is left on display.
     if (hour < 10) {
       lcd.print("0");
-      delay(10);
       lcd.print(hour);
-      delay(10);
       lcd.print(":");
     }
     else {
       lcd.print(hour);
-      delay(10);
       lcd.print(":");
     }
     if (minute < 10) {
       lcd.print("0");
-      delay(10);
       lcd.print(minute);
     }
     else {
       lcd.print(minute);
-      delay(10);
     }
   }
   
@@ -278,40 +278,40 @@ void loop() {
   // run the functions requested
   // by the user/control unite.
   //-----------------------------
-  if (Serial.available()) {                     // read from serial.
-    intRead = Serial.read();                    // Read the most recent int.    
-    
-    if (intRead == '1')                         // Command "1"from the command list.
-    {      
-      Serial.print(temp1);                      // Print temprature from sensor1 to serial.
-      Serial.println("C");                      
-      Serial.print(temp2);                      // Print temprature from sensor2 to serial.
-      Serial.println("C");
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '2')                    // Command "2" from the command list.
-    { 
-      lightsOn();                               // Turn on lights.
-      light = 2;
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '3')                    // Command "3" from the command list.
-    { 
-      lightsOff();                              // Turn off lights.
-      light = 2;
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '4')                    // Command "3" from the command list.
-    { 
-      lightsOff();                              // Turn off lights.
-      light = 0;
-      delay(5);                                 // Pause for stability.
-    }
-    else if (intRead == '5')                    // Command "4" from the command list.
-    { 
-      printDate();                              // Print date time to console.
-      delay(5);                                 // Pause for stability.
-    }
-  }  
+  //if (Serial.available()) {                     // read from serial.
+  //  intRead = Serial.read();                    // Read the most recent int.    
+  //  
+  //  if (intRead == '1')                         // Command "1"from the command list.
+  //  {      
+  //    Serial.print(temp1);                      // Print temprature from sensor1 to serial.
+  //    Serial.println("C");                      
+  //    Serial.print(temp2);                      // Print temprature from sensor2 to serial.
+  //    Serial.println("C");
+  //    delay(5);                                 // Pause for stability.
+  //  }
+  //  else if (intRead == '2')                    // Command "2" from the command list.
+  //  { 
+  //    lightsOn();                               // Turn on lights.
+  //    light = 2;
+  //    delay(5);                                 // Pause for stability.
+  //  }
+  //  else if (intRead == '3')                    // Command "3" from the command list.
+  //  { 
+  //    lightsOff();                              // Turn off lights.
+  //    light = 2;
+  //    delay(5);                                 // Pause for stability.
+  //  }
+  //  else if (intRead == '4')                    // Command "3" from the command list.
+  //  { 
+  //    lightsOff();                              // Turn off lights.
+  //    light = 0;
+  //    delay(5);                                 // Pause for stability.
+  //  }
+  //  else if (intRead == '5')                    // Command "4" from the command list.
+  //  { 
+  //    printDate();                              // Print date time to console.
+  //    delay(5);                                 // Pause for stability.
+  //  }
+  //}  
 }
 //--------- LOOP END ---------//
