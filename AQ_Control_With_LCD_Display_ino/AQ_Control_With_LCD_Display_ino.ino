@@ -238,11 +238,11 @@ void loop() {
   }
   //-- End light controlled by time --//
   
-  if (temp1 < 24.00 || temp2 < 24.00) {
+  if (temp1 < 25.00 || temp2 < 25.00) {
     lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP LO ");              // Warning for low temprature.
   }
-  else if (temp1 > 27.20 || temp2 > 27.20) {
+  else if (temp1 > 28.00 || temp2 > 28.00) {
     lcd.setCursor(0, 0);                        
     lcd.print("WARNING TEMP HI ");              // Warning for high temprature.
   }
