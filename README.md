@@ -1,8 +1,14 @@
+OLD VERSION
+============================================================
+I am working on a new more refined and better planned version
+=============================================================
+
+
+==========
 AQ_Control
 ==========
 
 AQ_Control is an Arduino aquarium control system.
-
 
 
 THE STORY:
